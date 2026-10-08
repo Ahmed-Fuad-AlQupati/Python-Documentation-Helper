@@ -2,6 +2,7 @@ from tkinter import Tk, Entry, Button, ttk, messagebox, Text
 
 library = None
 
+
 def getInfo():
     try:        
         exec(f"""import {value.get()} as lib
@@ -22,12 +23,26 @@ library = lib""")
 def showInfo():    
     info.config(state="n")
     try:
+        from io import StringIO
+        import sys
     
-        s = library.__getattribute__(data.item(data.selection())['values'][0]).__doc__
+        
+        
+        oldOutput = sys.stdout
+        
+        sys.stdout = helpText = StringIO()
+        
+        help(library.__getattribute__(data.item(data.selection())['values'][0]))
+        
+        showText = helpText.getvalue()
+        
+        sys.stdout = oldOutput
+        
+        #s = library.__getattribute__(data.item(data.selection())['values'][0]).__doc__
         
         
         info.delete("0.1","end")
-        info.insert("end", s)
+        info.insert("end", showText)
     except Exception as e:
         messagebox.showerror("Error", f"There is Some Error in This Choice.!!!\n\n{e}")
         
@@ -47,6 +62,7 @@ value.pack()
 
 Button(asd, text="Find", command=getInfo).pack()
 
+
 data = ttk.Treeview(asd, columns=("Name",), show="headings", height=15)
 data.pack( side = "left", fill="both",expand=True, pady=(10,5))
 data.heading("Name", text = "Name", anchor = "w")
@@ -58,15 +74,6 @@ asd.bind("<Return>", (lambda e: getInfo()))
 
 data.bind("<ButtonRelease>", (lambda e: showInfo()))
 
+
 value.focus()
 asd.mainloop()
-
-
-
-
-#import random
-
-#a = random.__getattribute__("_log").__doc__
-
-#print(a)
-#print(a)
