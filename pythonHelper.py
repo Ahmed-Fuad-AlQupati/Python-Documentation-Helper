@@ -1,4 +1,4 @@
-from tkinter import Tk, Entry, Button, ttk, messagebox, Text
+from tkinter import Tk, Entry, Button, ttk, messagebox, Text, Frame
 
 library = None
 
@@ -48,7 +48,14 @@ def showInfo():
         
     info.config(state="d")
     
-
+def fontSizing(scaling:bool):        
+    fontSize = int(info.cget("font").split()[1])    
+    if(scaling and fontSize < 30):                
+        fontSize += 1
+        
+    elif(not scaling and fontSize > 5):
+        fontSize -= 1
+    info.config(font = ("",fontSize,""))
 
 
 asd = Tk()
@@ -56,23 +63,36 @@ asd.title("Python Document Helper")
 asd.resizable(False,False)
 asd.geometry(f"800x390+{asd.winfo_screenwidth()//2-400}+{asd.winfo_screenheight()//2-195}")
 asd.config(bg="gray")
-value = Entry(asd)
+
+top = Frame(asd, bg = "gray")
+top.pack(fill='both')
+
+value = Entry(top)
 value.pack()
 
+Button(top, text="Find", command=getInfo).pack()
 
-Button(asd, text="Find", command=getInfo).pack()
+body = Frame(asd)
+body.pack(expand=True, fill='both')
 
-
-data = ttk.Treeview(asd, columns=("Name",), show="headings", height=15)
-data.pack( side = "left", fill="both",expand=True, pady=(10,5))
+data = ttk.Treeview(body, columns=("Name",), show="headings", height=15)
+data.pack( side = "left", fill="both")
 data.heading("Name", text = "Name", anchor = "w")
 
-info = Text(asd, width=70)
-info.pack(side="right", fill="both", pady=(10,5))
+info = Text(body, width=70, font=['',20,""])
+info.pack(side="left", fill="both", expand=True)
 info.config(state="d")
+
+
 asd.bind("<Return>", (lambda e: getInfo()))
 
+
 data.bind("<ButtonRelease>", (lambda e: showInfo()))
+
+
+top.bind("<Control-MouseWheel>", (lambda e: fontSizing(True)if e.delta > 0 else fontSizing(False)))
+asd.bind("<Control-]>", (lambda e: fontSizing(True)))
+asd.bind("<Control-[>", (lambda e: fontSizing(False)))
 
 
 value.focus()
